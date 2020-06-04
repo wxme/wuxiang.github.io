@@ -2,6 +2,8 @@
 
 ### Java基础
 
+[TOC]
+
 1. equals与==的区别
 
    equals:在Object.class类中由==实现,在其他重写equals方法中会比较hashcode,也会==
