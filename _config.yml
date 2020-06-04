@@ -6,7 +6,7 @@ email: 18428368840@163.com
 description: 这是一个有趣的博客
 keyword: "java"
 url: "https:/wxme.github.io"
-theme: jekyll-theme-minimal
+theme: jekyll-theme-hacker
 
 # sitebar settings
 sidebar: true
