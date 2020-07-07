@@ -4,11 +4,7 @@
 * Java
 
   * [Java面试](./articles/interview/interview-all.md)
-  * <details>
-		<summary>Java集合</summary>
-		<a href="./docs/b-2Java集合.md">ArrayList</a>
-	</details>
-  * [Java集合](./docs/b-2Java集合.md)
+  * [Java集合](./articles/basics/collections/index.md)
   * [Java多线程](./docs/b-3Java多线程.md)
   * [jvm](./docs/b-4jvm.md)
 
