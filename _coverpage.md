@@ -1,5 +1,5 @@
 <p align="center">
-<img src="\images\icon.png" width="400" height="200"/>
+<img src="https://guli-1847.oss-cn-chengdu.aliyuncs.com/icon.png" width="400" height="200"/>
 </p>
 <h1 align="center">javaer-wx</h1>
 
