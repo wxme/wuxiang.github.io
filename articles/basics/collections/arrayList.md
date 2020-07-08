@@ -1,6 +1,5 @@
 # ArrayList
-### 概述 
-ArrayList是一种以数组实现的List，允许包括null在内的数据存储，且数组可自动扩容或缩减。
+> 可调整大小的数组的实现List接口。实现所有可选列表操作，并允许所有元素，包括null 。
 
 ### 继承体系
 ![ArrayList](../../../images/arrayList.png "ArrayList")
@@ -25,8 +24,11 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
     // 最大数组长度
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 ```
-#### 构造方法
+<span id='p1'/>PS:  
+[关于`EMPTY_ELEMENTDATA`和`DEFAULTCAPACITY_EMPTY_ELEMENTDATA`分析](#k1)  
+[关于`transient`修饰`elementData`分析](#k2)
 
+#### 构造方法
 
 1. ArrayList(int initialCapacity)  
 传入初始容量构造指定容量的ArrayList
@@ -45,11 +47,11 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
     }
 ```
 2. ArrayList()  
-初始化一个容量为10的空数组
+初始化一个空数组,后续扩容时会初始化为默认容量
 ```java
     public ArrayList() {
-            this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
-        }
+        this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
+    }
 ```
 3. ArrayList(Collection<? extends E> c)  
 创建一个包含指定集合元素的列表
@@ -69,10 +71,7 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
         }
 ```
 
-#### 增删改查方法
-
 #### 新增
-
 
 1. `add(E e)`  
 向数组尾部增加一个元素,成功返回true
@@ -84,49 +83,6 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
             elementData[size++] = e;
             return true;
         }
-    // ------------扩容
-    private void ensureCapacityInternal(int minCapacity) {
-        ensureExplicitCapacity(calculateCapacity(elementData, minCapacity));
-    }
-    // ------------计算最小容量
-    private static int calculateCapacity(Object[] elementData, int minCapacity) {
-        // 如果元素数组为空数组,则返回默认容量值(10)与指定容量之间最大值
-        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
-            return Math.max(DEFAULT_CAPACITY, minCapacity);
-        }
-        return minCapacity;
-    }
-    // ------------扩容
-    private void ensureExplicitCapacity(int minCapacity) {
-        // 操作值+1
-        modCount++;
-
-        // 如果指定容量比现有容量大则扩容
-        if (minCapacity - elementData.length > 0)
-            grow(minCapacity);
-    }
-    // ------------扩容
-    private void grow(int minCapacity) {
-        // 新容量为旧容量1.5倍
-        int oldCapacity = elementData.length;
-        int newCapacity = oldCapacity + (oldCapacity >> 1);
-        // 如果新容量小于旧容量就缩减容量
-        if (newCapacity - minCapacity < 0)
-            newCapacity = minCapacity;
-        // 如果新容量大于最大数组长度,就是用最大值
-        if (newCapacity - MAX_ARRAY_SIZE > 0)
-            newCapacity = hugeCapacity(minCapacity);
-        // 复制新数组
-        elementData = Arrays.copyOf(elementData, newCapacity);
-    }
-    // ------------计算最大值返回
-    private static int hugeCapacity(int minCapacity) {
-        if (minCapacity < 0) // overflow
-            throw new OutOfMemoryError();
-        return (minCapacity > MAX_ARRAY_SIZE) ?
-            Integer.MAX_VALUE :
-            MAX_ARRAY_SIZE;
-    }
 ```
 
 2. `add(int index, E element)`  
@@ -193,7 +149,54 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
     }
 ```
 
-### 查询
+**扩容原理**
+```java
+    // ------------扩容
+    private void ensureCapacityInternal(int minCapacity) {
+        ensureExplicitCapacity(calculateCapacity(elementData, minCapacity));
+    }
+    // ------------计算最小容量
+    private static int calculateCapacity(Object[] elementData, int minCapacity) {
+        // 如果元素数组为空数组,则返回默认容量值(10)与指定容量之间最大值
+        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
+            return Math.max(DEFAULT_CAPACITY, minCapacity);
+        }
+        return minCapacity;
+    }
+    // ------------扩容
+    private void ensureExplicitCapacity(int minCapacity) {
+        // 操作值+1
+        modCount++;
+
+        // 如果指定容量比现有容量大则扩容
+        if (minCapacity - elementData.length > 0)
+            grow(minCapacity);
+    }
+    // ------------扩容
+    private void grow(int minCapacity) {
+        // 新容量为旧容量1.5倍
+        int oldCapacity = elementData.length;
+        int newCapacity = oldCapacity + (oldCapacity >> 1);
+        // 如果新容量小于旧容量就缩减容量
+        if (newCapacity - minCapacity < 0)
+            newCapacity = minCapacity;
+        // 如果新容量大于最大数组长度,就是用最大值
+        if (newCapacity - MAX_ARRAY_SIZE > 0)
+            newCapacity = hugeCapacity(minCapacity);
+        // 复制新数组
+        elementData = Arrays.copyOf(elementData, newCapacity);
+    }
+    // ------------计算最大值返回
+    private static int hugeCapacity(int minCapacity) {
+        if (minCapacity < 0) // overflow
+            throw new OutOfMemoryError();
+        return (minCapacity > MAX_ARRAY_SIZE) ?
+            Integer.MAX_VALUE :
+            MAX_ARRAY_SIZE;
+    }
+```
+
+#### 查询
 
 1. `get(int index)`  
 获取指定索引元素
@@ -236,7 +239,7 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
         return indexOf(o) >= 0;
     }
 ```
-### 修改
+#### 修改
 
 1. `set(int index, E element)`  
 将指定索引位置修改为指定元素,返回旧元素
@@ -253,7 +256,28 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
     }
 ```
 
-### 删除
+2. `replaceAll(UnaryOperator<E> operator)`  
+将列表的每个元素进行operator操作
+```java
+    public void replaceAll(UnaryOperator<E> operator) {
+        // 检查null
+        Objects.requireNonNull(operator);
+        // 获取操作数和元素数
+        final int expectedModCount = modCount;
+        final int size = this.size;
+        // 遍历进行operator的apply操作
+        for (int i=0; modCount == expectedModCount && i < size; i++) {
+            elementData[i] = operator.apply((E) elementData[i]);
+        }
+        // fail-fast
+        if (modCount != expectedModCount) {
+            throw new ConcurrentModificationException();
+        }
+        modCount++;
+    }
+```
+
+#### 删除
 
 1. `remove(int index)`  
 删除指定位置元素,返回被删除的元素
@@ -343,8 +367,8 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
     }
 ```
 
-4. `retainAll(Collection<?> c)`  
-删除指定集合不包含的元素
+4. `retainAll(Collection<?> c)` 
+  删除指定集合不包含的元素
 ```java
     public boolean retainAll(Collection<?> c) {
         // 判断null
@@ -384,15 +408,18 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
         final boolean anyToRemove = removeCount > 0;
         if (anyToRemove) {
             final int newSize = size - removeCount;
-            // 将未移除的
+            // 使用bitSet过滤剩余的元素,并将其放在依次方法数组前
             for (int i=0, j=0; (i < size) && (j < newSize); i++, j++) {
                 i = removeSet.nextClearBit(i);
                 elementData[j] = elementData[i];
             }
+            // 将数组尾部填充null
             for (int k=newSize; k < size; k++) {
                 elementData[k] = null;  // Let gc do its work
             }
+            // 更新元素数
             this.size = newSize;
+            // fail-fast
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
@@ -400,5 +427,63 @@ ArrayList是一种以数组实现的List，允许包括null在内的数据存储
         }
 
         return anyToRemove;
+    }
+```
+
+#### EXTRA
+- <span id="k1"/>*关于`DEFAULTCAPACITY_EMPTY_ELEMENTDATA`和`EMPTY_ELEMENTDATA`*[出处](#p1)   
+  两个值都是定义的空数组  
+  `DEFAULTCAPACITY_EMPTY_ELEMENTDATA`用于无参构造函数初始化数组,后扩容默认最小为`DEFAULT_CAPACITY`即为10  
+  `EMPTY_ELEMENTDATA`用于有参构造时参数数组长度为0时初始化数组,此时默认最小大小为输入值
+- <span id="k2"/>*使用`transient`修饰`elementData`*[出处](#p1)  
+  `transient`修饰的参数不会被序列化  
+  在ArrayList中数组`elementData`的长度 >= 真实元素数`size`,故在序列化的时候不需要将整个数组序列化,而是将存储的元素序列化即可  
+- *自定义序列化和反序列化*  
+  JVM在序列化/反序列化时会调用对象的对应方法,重写`readObject()`和`writeObject()`实现自定义  
+```java
+    // 序列化
+    private void writeObject(ObjectOutputStream s)
+        int expectedModCount = modCount;
+        s.defaultWriteObject();
+        // 写入元素数
+        s.writeInt(size);
+        // 将元素写入流
+        for (int i=0; i<size; i++) {
+            s.writeObject(elementData[i]);
+        }
+        // fail-fast
+        if (modCount != expectedModCount) {
+            throw new ConcurrentModificationException();
+        }
+    }
+    // 反序列化
+    private void readObject(ObjectInputStream s){
+        elementData = EMPTY_ELEMENTDATA;
+        s.defaultReadObject();
+
+        s.readInt(); 
+
+        if (size > 0) {
+            // 检查容量以及检查流
+            int capacity = calculateCapacity(elementData, size);
+            SharedSecrets.getJavaOISAccess().checkArray(s, Object[].class, capacity);
+            // 扩容以及赋予新数组
+            ensureCapacityInternal(size);
+
+            Object[] a = elementData;
+            // 将流中元素填充进数组
+            for (int i=0; i<size; i++) {
+                a[i] = s.readObject();
+            }
+        }
+    }
+```
+- *FAIL-FAST:快速失败机制*  
+ArrayList的操作环境是不安全的,当多线程操作ArrayList时不能保证线程安全,故当一个线程在修改/删除元素操作时如果被其他线程对数据结构干扰,此时不能保证数据安全性,所以抛出`ConcurrentModificationException`  
+核心原理:在执行操作时记录旧值expectedModCount,如果在执行更新数据操作时modCount的值不与旧值一致就证明其他线程执行了更新操作故抛出异常终止操作
+```java
+    final int expectedModCount = modCount;
+    if (modCount != expectedModCount) {
+        throw new ConcurrentModificationException();
     }
 ```
